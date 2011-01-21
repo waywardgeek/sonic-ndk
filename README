@@ -1,2 +1,6 @@
 This is the libsonic Android NDK wrapper.  Copyright Bill Cox, 2011, all rights
 reserved.  This code is released under the LGPL v2.1 license.
+
+Sina, feel free to copyright files you create, but let's use the same license.
+This NDK library should be LGPL, rather than GPL, but the BookWarp app can be
+pure GPL.
