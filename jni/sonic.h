@@ -19,12 +19,12 @@
    02111-1307 USA.  */
 
 /*
-The Sonic Library implements Pitch Based Resampling, which is a new algorithm
-invented by Bill Cox for the specific purpose of speeding up speech by high
-factors at high quality.  It generates smooth speech at speed up factors as high
-as 6X, possibly more.  It is also capable of slowing down speech, and generates
-high quality results regardless of the speed up or slow down factor.  For
-speeding up speech by 2X or more, the following equation is used:
+The Sonic Library implements a new algorithm invented by Bill Cox for the
+specific purpose of speeding up speech by high factors at high quality.  It
+generates smooth speech at speed up factors as high as 6X, possibly more.  It is
+also capable of slowing down speech, and generates high quality results
+regardless of the speed up or slow down factor.  For speeding up speech by 2X or
+more, the following equation is used:
 
     newSamples = period/(speed - 1.0)
     scale = 1.0/newSamples;
@@ -58,6 +58,14 @@ until the output desired speed is reached.  The length of data copied is:
 For slow down factors between 0.5 and 0.5, no data is copied, and an algorithm
 similar to high speed factors is used.
 */
+
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
+/* Uncomment this to use sin-wav based overlap add which in theory can improve
+   sound quality slightly, at the expense of lots of floating point math. */
+/* #define SONIC_USE_SIN */
 
 /* This specifies the range of voice pitches we try to match.
    Note that if we go lower than 65, we could overflow in findPitchInRange */
@@ -110,10 +118,23 @@ void sonicSetSpeed(sonicStream stream, float speed);
 float sonicGetPitch(sonicStream stream);
 /* Set the pitch of the stream. */
 void sonicSetPitch(sonicStream stream, float pitch);
+/* Get the rate of the stream. */
+float sonicGetRate(sonicStream stream);
+/* Set the rate of the stream. */
+void sonicSetRate(sonicStream stream, float rate);
 /* Get the scaling factor of the stream. */
 float sonicGetVolume(sonicStream stream);
 /* Set the scaling factor of the stream. */
 void sonicSetVolume(sonicStream stream, float volume);
+/* Get the chord pitch setting. */
+int sonicGetChordPitch(sonicStream stream);
+/* Set chord pitch mode on or off.  Default is off.  See the documentation
+   page for a description of this feature. */
+void sonicSetChordPitch(sonicStream stream, int useChordPitch);
+/* Get the quality setting. */
+int sonicGetQuality(sonicStream stream);
+/* Set the "quality".  Default 0 is virtually as good as 1, but very much faster. */
+void sonicSetQuality(sonicStream stream, int quality);
 /* Get the sample rate of the stream. */
 int sonicGetSampleRate(sonicStream stream);
 /* Get the number of channels. */
@@ -122,9 +143,13 @@ int sonicGetNumChannels(sonicStream stream);
    sample.  It works in-place on the sample array, so there must be at least
    speed*numSamples available space in the array. Returns the new number of samples. */
 int sonicChangeFloatSpeed(float *samples, int numSamples, float speed, float pitch,
-    float volume, int sampleRate, int numChannels);
+    float rate, float volume, int useChordPitch, int sampleRate, int numChannels);
 /* This is a non-stream oriented interface to just change the speed of a sound
    sample.  It works in-place on the sample array, so there must be at least
    speed*numSamples available space in the array. Returns the new number of samples. */
 int sonicChangeShortSpeed(short *samples, int numSamples, float speed, float pitch,
-    float volume, int sampleRate, int numChannels);
+    float rate, float volume, int useChordPitch, int sampleRate, int numChannels);
+
+#ifdef  __cplusplus
+}
+#endif
