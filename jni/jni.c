@@ -1,41 +1,40 @@
 #include <jni.h>
+#include <android/log.h>
+#include <stdlib.h>
 #include "sonic.h"
 
-jstring
-Java_org_vinuxproject_sonic_Sonic_stringFromJNI( JNIEnv* env,
-                                                  jobject thiz )
-{
-    return (*env)->NewStringUTF(env, "Hello from Sonic!");
-}
+// For debug messages, use:
+// __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "1 + 1 is %d", 1 + 1);
+#define APPNAME "Sonic"
+
+static sonicStream stream = 0;
+static short *outBuf;
+static int outBufSize;
 
 /* Initialize the C data structure */
-void Java_org_vinuxproject_Sonic_init(
-    JNIEnv env,
+void Java_org_vinuxproject_sonic_SonicAudio_init(
+    JNIEnv *env,
     jobject thiz,
     jint sampleRate,
     jint channels)
 {
-    jclass clazz = env->FindClass(&env, "org/vinuxproject/Sonic");
-    sonicStream stream = sonicCreateStream(sampleRate, channels);
-    jfieldID fid = env->GetFieldID(&env, clazz, "ptr", "J");
-
-    env->SetIntField(&env, thiz, fid, (int)(void *)stream);
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Creating sonic stream");
+    stream = sonicCreateStream(sampleRate, channels);
+    outBufSize = 100;
+    outBuf = (short *)calloc(outBufSize, sizeof(short));
 }
 
 /* Put bytes into the input buffer of the sound alteration object
    lenBytes bytes will be read from buffer into the sound alteration object
    buffer is not guaranteed not to change after this function is called,
    so data should be copied from it */
-void Java_org_vinuxproject_Sonic_putBytes(
-    JNIEnv env,
+void Java_org_vinuxproject_sonic_SonicAudio_putBytes(
+    JNIEnv *env,
     jobject thiz,
     jbyteArray buffer,
     jint lenBytes)
 {
-    jclass clazz = env->FindClass(&env, "org/vinuxproject/Sonic");
-    jfieldID fid = env->GetFieldID(&env, clazz, "ptr", "J");
-    sonicStream stream = (sonicStream)env->GetIntField(&env, thiz, fid);
-    
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Writing %d bytes to stream", lenBytes);
     sonicWriteShortToStream(stream, (short *)(void *)buffer,
         lenBytes/(sizeof(short)*sonicGetNumChannels(stream)));
 }
@@ -43,147 +42,142 @@ void Java_org_vinuxproject_Sonic_putBytes(
 // Get bytes representing sped up/slowed down sound and put up to lenBytes
 // into ret.
 // Returns number of bytes read.
-jint Java_org_vinuxproject_Sonic_receiveBytes(
-    JNIEnv env,
+jint Java_org_vinuxproject_sonic_SonicAudio_receiveBytes(
+    JNIEnv *env,
     jobject thiz,
     jbyteArray ret,
     jint lenBytes)
 {
-    int bytesRead;
+    int available = sonicSamplesAvailable(stream)*sizeof(short)*sonicGetNumChannels(stream);
+    int samplesRead, bytesRead;
 
-    jclass clazz = env->FindClass(&env, "org/vinuxproject/Sonic");
-    jfieldID fid = env->GetFieldID(&env, clazz, "ptr", "J");
-    sonicStream stream = (sonicStream)env->GetIntField(&env, thiz, fid);
-
-    bytesRead = sonicReadShortFromStream(stream, (short *)(void *)ret,
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading %d bytes from stream", lenBytes);
+    if(lenBytes > available) {
+        lenBytes = available;
+    }
+    if(lenBytes > outBufSize*sizeof(short)) {
+        outBufSize = lenBytes*(2/sizeof(short));
+        outBuf = (short *)realloc(outBuf, outBufSize*sizeof(short));
+    }
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Doing read %d", lenBytes);
+    samplesRead = sonicReadShortFromStream(stream, outBuf,
 	lenBytes/(sizeof(short)*sonicGetNumChannels(stream)));
-    return bytesRead; 
+    bytesRead = samplesRead*sizeof(short)*sonicGetNumChannels(stream); 
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Returning %d", samplesRead);
+     (*env)->SetByteArrayRegion(env, ret, 0, bytesRead, (jbyte *)outBuf);
+    return bytesRead;
 }
 
 // Set pitch in sound alteration object
-void Java_org_vinuxproject_Sonic_setPitch(
-    JNIEnv env,
+void Java_org_vinuxproject_sonic_SonicAudio_setPitch(
+    JNIEnv *env,
     jobject thiz,
     jfloat newPitch)
 {
-    jclass clazz = env->FindClass(&env, "org/vinuxproject/Sonic");
-    jfieldID fid = env->GetFieldID(&env, clazz, "ptr", "J");
-    sonicStream sonic = (sonicStream) env->GetIntField(&env, thiz, fid);
-
-	// TODO: Set pitch in sound alteration object
-    sonicSetPitch(sonic, newPitch);
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Set pitch to %f", newPitch);
+    sonicSetPitch(stream, newPitch);
 }
 
 // Get the current pitch.
-jfloat Java_org_vinuxproject_Sonic_getPitch(
-    JNIEnv env,
+jfloat Java_org_vinuxproject_sonic_SonicAudio_getPitch(
+    JNIEnv *env,
     jobject thiz)
 {
-    jclass clazz = env->FindClass(&env, "org/vinuxproject/Sonic");
-    jfieldID fid = env->GetFieldID(&env, clazz, "ptr", "J");
-    sonicStream sonic = (sonicStream)env->GetIntField(&env, thiz, fid);
-
-    return sonicGetPitch(sonic);
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading pitch");
+    return sonicGetPitch(stream);
 }
 
 // Speed up the sound and increase the pitch, or slow down the sound and
 // decrease the pitch.
-void Java_org_vinuxproject_Sonic_setRate(
-    JNIEnv env,
+void Java_org_vinuxproject_sonic_SonicAudio_setRate(
+    JNIEnv *env,
     jobject thiz,
     jfloat newRate)
 {
-    jclass clazz = env->FindClass(&env, "org/vinuxproject/Sonic");
-    jfieldID fid = env->GetFieldID(&env, clazz, "ptr", "J");
-    sonicStream sonic = (sonicStream)env->GetIntField(&env, thiz, fid);
-
-    sonicSetRate(sonic, newRate);
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Set rate to %f", newRate);
+    sonicSetRate(stream, newRate);
 }
 
 // Return the current playback rate.
-jfloat Java_org_vinuxproject_Sonic_getRate(
-    JNIEnv env,
+jfloat Java_org_vinuxproject_sonic_SonicAudio_getRate(
+    JNIEnv *env,
     jobject thiz)
 {
-    jclass clazz = env->FindClass(&env, "org/vinuxproject/Sonic");
-    jfieldID fid = env->GetFieldID(&env, clazz, "ptr", "J");
-    sonicStream sonic = (sonicStream)env->GetIntField(&env, thiz, fid);
-
-    return sonicGetRate(sonic);
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading rate");
+    return sonicGetRate(stream);
 }
 
 // Get the current speed.
-jint Java_org_vinuxproject_Sonic_getSpeed(
-    JNIEnv env,
+jint Java_org_vinuxproject_sonic_SonicAudio_getSpeed(
+    JNIEnv *env,
     jobject thiz)
 {
-    jclass clazz = env->FindClass(&env, "org/vinuxproject/Sonic");
-    jfieldID fid = env->GetFieldID(&env, clazz, "ptr", "J");
-    sonicStream sonic = (sonicStream)env->GetIntField(&env, thiz, fid);
-
-    return sonicGetSpeed(sonic);
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading speed");
+    return sonicGetSpeed(stream);
 }
 
 // Change the speed.
-void Java_org_vinuxproject_Sonic_setSpeed(
-    JNIEnv env,
+void Java_org_vinuxproject_sonic_SonicAudio_setSpeed(
+    JNIEnv *env,
     jobject thiz,
     jfloat newSpeed)
 {
-    jclass clazz = env->FindClass(&env, "org/vinuxproject/Sonic");
-    jfieldID fid = env->GetFieldID(&env, clazz, "ptr", "J");
-    sonicStream sonic = (sonicStream) env->GetIntField(&env, thiz, fid);
-
-    sonicSetSpeed(sonic, newSpeed);
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Set speed to %f", newSpeed);
+    sonicSetSpeed(stream, newSpeed);
 }
 
 // Get the current chord pitch setting.
-jboolean Java_org_vinuxproject_Sonic_getChordPitch(
-    JNIEnv env,
+jboolean Java_org_vinuxproject_sonic_SonicAudio_getChordPitch(
+    JNIEnv *env,
     jobject thiz)
 {
-    jclass clazz = env->FindClass(&env, "org/vinuxproject/Sonic");
-    jfieldID fid = env->GetFieldID(&env, clazz, "ptr", "J");
-    sonicStream sonic = (sonicStream) env->GetIntField(&env, thiz, fid);
-
-    return sonicGetChordPitch(sonic);
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading chord pitch");
+    return sonicGetChordPitch(stream);
 }
 
 // Set chord pitch mode on or off.  Default is off.
-void Java_org_vinuxproject_Sonic_setChordPitch(
-    JNIEnv env,
+void Java_org_vinuxproject_sonic_SonicAudio_setChordPitch(
+    JNIEnv *env,
     jobject thiz,
     jboolean useChordPitch)
 {
-    jclass clazz = env->FindClass(&env, "org/vinuxproject/Sonic");
-    jfieldID fid = env->GetFieldID(&env, clazz, "ptr", "J");
-    sonicStream sonic = (sonicStream) env->GetIntField(&env, thiz, fid);
-
-   sonicSetChordPitch(sonic, useChordPitch);
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Set chord pitch to %d", useChordPitch);
+    sonicSetChordPitch(stream, useChordPitch);
 }
 
 // Returns the number of bytes that can be read from the speed alteration
 // object
-jint Java_org_vinuxproject_Sonic_availableBytes(
-    JNIEnv env,
+jint Java_org_vinuxproject_sonic_SonicAudio_availableBytes(
+    JNIEnv *env,
     jobject thiz)
 {
-    jclass clazz = env->FindClass(&env, "org/vinuxproject/Sonic");
-    jfieldID fid = env->GetFieldID(&env, clazz, "ptr", "J");
-    sonicStream stream = (sonicStream) env->GetIntField(&env, thiz, fid);
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading samples available");
 
-    return sonicSamplesAvailable(stream)*sizeof(short);
+    return sonicSamplesAvailable(stream)*sizeof(short)*sonicGetNumChannels(stream);
+}
+
+// Process any samples still in a sonic buffer.
+void Java_org_vinuxproject_sonic_SonicAudio_flush(
+    JNIEnv *env,
+    jobject thiz)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Flushing stream");
+    sonicFlushStream(stream);
 }
 
 // Teardown the C data structure.
-void Java_org_vinuxproject_Sonic_close(
-    JNIEnv env,
+void Java_org_vinuxproject_sonic_SonicAudio_close(
+    JNIEnv *env,
     jobject thiz)
 {
-    jclass clazz = env->FindClass(&env, "org/vinuxproject/Sonic");
-    jfieldID fid = env->GetFieldID(&env, clazz, "ptr", "J");
-    sonicStream stream = (sonicStream) env->GetIntField(&env, thiz, fid);
-
-    sonicDestroyStream(stream);
-    env->SetIntField(&env, thiz, fid, 0);
+    if(stream != 0) {
+        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Destroying stream");
+        sonicDestroyStream(stream);
+        free(outBuf);
+        outBuf = 0;
+        outBufSize = 0;
+    } else {
+        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Stream already destroyed");
+    }
+    stream = 0;
 }

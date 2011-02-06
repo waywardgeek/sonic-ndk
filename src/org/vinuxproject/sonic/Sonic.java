@@ -1,44 +1,55 @@
 package org.vinuxproject.sonic;
 
+import java.io.IOException;
+import java.io.InputStream;
 import android.app.Activity;
-import android.widget.TextView;
 import android.os.Bundle;
 
 public class Sonic extends Activity
-{
-    /** Called when the activity is first created. */
+{	    
     @Override
-    public void onCreate(Bundle savedInstanceState)
+    public void onCreate(Bundle savedInstanceState) 
     {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);                      
+ 
+        new Thread( new Runnable( ) 
+        {
+            public void run( )
+            {        		
+                AndroidAudioDevice device = new AndroidAudioDevice(22050, 1);
+                SonicAudio sonic = new SonicAudio(22050, 1);
+                float speed = 2.0f; // The amount for sonic to speed up audio
+                byte samples[] = new byte[2048];
+                byte modifiedSamples[] = new byte[2048];
+                InputStream soundFile = getResources().openRawResource(R.raw.talking);
+				int bytesRead;
 
-        TextView  tv = new TextView(this);
-        tv.setText( stringFromJNI() );
-        setContentView(tv);
-               
-    }
-
-    /* A native method that is implemented by the
-     * 'sonic' native library, which is packaged
-     * with this application.
-     */
-    public native String  stringFromJNI();
-
-    public native void init(int sampleRate, int channels);
-    public native void close();
-    public native void setPitch(float newPitch);
-    public native float getPitch();
-    public native void setSpeed(float newSpeed);
-    public native float getSpeed();
-    public native void putBytes(byte[] buffer, int lenBytes);
-    public native int receiveBytes(byte[] ret, int lenBytes);
-    public native int availableBytes();
-
-    /* Public so it wont get optimized away */
-// TODO: replace this with cleaner version
-    public int ptr;
-
-    static {
-        System.loadLibrary("sonic");
+				if(soundFile != null) {
+				    sonic.setSpeed(speed);
+				    do {
+				        try {
+							bytesRead = soundFile.read(samples, 0, samples.length);
+						} catch (IOException e) {
+							e.printStackTrace();
+							return;
+						}
+				        if(bytesRead > 0) {
+				        	sonic.putBytes(samples, bytesRead);
+				        } else {
+						    sonic.flush();
+				        }
+			        	int available = sonic.availableBytes(); 
+			        	if(available > 0) {
+			        		if(modifiedSamples.length < available) {
+			        		    modifiedSamples = new byte[available*2];
+			        		}
+			        		sonic.receiveBytes(modifiedSamples, available);
+			        		device.writeSamples(modifiedSamples, available);
+			        	}
+				    } while(bytesRead > 0);
+				    device.flush();
+				}
+            }
+        } ).start();
     }
 }
