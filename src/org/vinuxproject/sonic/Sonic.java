@@ -1,3 +1,10 @@
+// This file was written by me, Bill Cox in 2011.
+// I place this file into the public domain.  Feel free to copy from it.
+// Note, however that libsonic, which this application links to,
+// is licensed under LGPL.  You can link to it in your commercial application,
+// but any changes you make to sonic.c or sonic.h need to be shared under
+// the LGPL license.
+
 package org.vinuxproject.sonic;
 
 import java.io.IOException;

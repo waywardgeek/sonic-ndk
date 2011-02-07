@@ -1,3 +1,8 @@
+// This file was written by Mario Zechner, who posted it on his blog at:
+//     http://www.badlogicgames.com/wordpress/?p=228
+// For clarification, I asked if he intended to place it in the public domain,
+// and he said I have permission to do whatever I like with the code.
+
 package org.vinuxproject.sonic;
 
 import android.media.AudioFormat;

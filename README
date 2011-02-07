@@ -1,6 +1,13 @@
-This is the libsonic Android NDK wrapper.  Copyright Bill Cox, 2011, all rights
-reserved.  This code is released under the LGPL v2.1 license.
+This is the libsonic Android NDK wrapper.  I, Bill Cox, wrote it in 2011, with
+the exception of AndroidAudioDevice.java, which was written by Mario Zechner,
+who posted it on his blog at
 
-Sina, feel free to copyright files you create, but let's use the same license.
-This NDK library should be LGPL, rather than GPL, but the BookWarp app can be
-pure GPL.
+    http://www.badlogicgames.com/wordpress/?p=228
+
+Mario has given me permission to place this code into the public domain as well.
+I place all of the files created for this project into the public domain.
+However, the files sonic.c and sonic.h are from the Vinux "sonic" package and
+are licensed under GNU Lesser General Public License version 2.1. You can freely
+use this NDK application with your commercial application, but if you make
+changes to sonic.c or sonic.h, those changes must be shared as described in the
+file COPYING.
