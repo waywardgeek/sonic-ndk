@@ -29,6 +29,9 @@ public class Sonic extends Activity
 				    do {
 				        try {
 							bytesRead = soundFile.read(samples, 0, samples.length);
+							if((bytesRead & 1) != 0) {
+							    finish();
+							}
 						} catch (IOException e) {
 							e.printStackTrace();
 							return;
@@ -48,6 +51,7 @@ public class Sonic extends Activity
 			        	}
 				    } while(bytesRead > 0);
 				    device.flush();
+				    finish();
 				}
             }
         } ).start();

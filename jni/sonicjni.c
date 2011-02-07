@@ -1,15 +1,15 @@
 #include <jni.h>
-#include <android/log.h>
+//#include <android/log.h>
 #include <stdlib.h>
 #include "sonic.h"
 
 // For debug messages, use:
-// __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "1 + 1 is %d", 1 + 1);
-#define APPNAME "Sonic"
+//__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "1 + 1 is %d", 1 + 1);
+//#define APPNAME "Sonic"
 
 static sonicStream stream = 0;
-static short *outBuf;
-static int outBufSize;
+static short *byteBuf;
+static int byteBufSize;
 
 /* Initialize the C data structure */
 void Java_org_vinuxproject_sonic_SonicAudio_init(
@@ -18,10 +18,10 @@ void Java_org_vinuxproject_sonic_SonicAudio_init(
     jint sampleRate,
     jint channels)
 {
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Creating sonic stream");
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Creating sonic stream");
     stream = sonicCreateStream(sampleRate, channels);
-    outBufSize = 100;
-    outBuf = (short *)calloc(outBufSize, sizeof(short));
+    byteBufSize = 100;
+    byteBuf = (short *)calloc(byteBufSize, sizeof(short));
 }
 
 /* Put bytes into the input buffer of the sound alteration object
@@ -34,9 +34,17 @@ void Java_org_vinuxproject_sonic_SonicAudio_putBytes(
     jbyteArray buffer,
     jint lenBytes)
 {
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Writing %d bytes to stream", lenBytes);
-    sonicWriteShortToStream(stream, (short *)(void *)buffer,
-        lenBytes/(sizeof(short)*sonicGetNumChannels(stream)));
+    int samples = lenBytes/(sizeof(short)*sonicGetNumChannels(stream));
+    int remainingBytes = lenBytes - samples*sizeof(short)*sonicGetNumChannels(stream);
+
+// TODO: deal with case where remainingBytes is not 0.
+    if(lenBytes > byteBufSize*sizeof(short)) {
+        byteBufSize = lenBytes*(2/sizeof(short));
+        byteBuf = (short *)realloc(byteBuf, byteBufSize*sizeof(short));
+    }
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Writing %d bytes to stream", lenBytes);
+    (*env)->GetByteArrayRegion(env, buffer, 0, lenBytes, (jbyte *)byteBuf);
+    sonicWriteShortToStream(stream, byteBuf, samples);
 }
 
 // Get bytes representing sped up/slowed down sound and put up to lenBytes
@@ -51,20 +59,20 @@ jint Java_org_vinuxproject_sonic_SonicAudio_receiveBytes(
     int available = sonicSamplesAvailable(stream)*sizeof(short)*sonicGetNumChannels(stream);
     int samplesRead, bytesRead;
 
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading %d bytes from stream", lenBytes);
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading %d bytes from stream", lenBytes);
     if(lenBytes > available) {
         lenBytes = available;
     }
-    if(lenBytes > outBufSize*sizeof(short)) {
-        outBufSize = lenBytes*(2/sizeof(short));
-        outBuf = (short *)realloc(outBuf, outBufSize*sizeof(short));
+    if(lenBytes > byteBufSize*sizeof(short)) {
+        byteBufSize = lenBytes*(2/sizeof(short));
+        byteBuf = (short *)realloc(byteBuf, byteBufSize*sizeof(short));
     }
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Doing read %d", lenBytes);
-    samplesRead = sonicReadShortFromStream(stream, outBuf,
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Doing read %d", lenBytes);
+    samplesRead = sonicReadShortFromStream(stream, byteBuf,
 	lenBytes/(sizeof(short)*sonicGetNumChannels(stream)));
     bytesRead = samplesRead*sizeof(short)*sonicGetNumChannels(stream); 
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Returning %d", samplesRead);
-     (*env)->SetByteArrayRegion(env, ret, 0, bytesRead, (jbyte *)outBuf);
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Returning %d", samplesRead);
+    (*env)->SetByteArrayRegion(env, ret, 0, bytesRead, (jbyte *)byteBuf);
     return bytesRead;
 }
 
@@ -74,7 +82,7 @@ void Java_org_vinuxproject_sonic_SonicAudio_setPitch(
     jobject thiz,
     jfloat newPitch)
 {
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Set pitch to %f", newPitch);
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Set pitch to %f", newPitch);
     sonicSetPitch(stream, newPitch);
 }
 
@@ -83,7 +91,7 @@ jfloat Java_org_vinuxproject_sonic_SonicAudio_getPitch(
     JNIEnv *env,
     jobject thiz)
 {
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading pitch");
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading pitch");
     return sonicGetPitch(stream);
 }
 
@@ -94,7 +102,7 @@ void Java_org_vinuxproject_sonic_SonicAudio_setRate(
     jobject thiz,
     jfloat newRate)
 {
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Set rate to %f", newRate);
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Set rate to %f", newRate);
     sonicSetRate(stream, newRate);
 }
 
@@ -103,7 +111,7 @@ jfloat Java_org_vinuxproject_sonic_SonicAudio_getRate(
     JNIEnv *env,
     jobject thiz)
 {
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading rate");
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading rate");
     return sonicGetRate(stream);
 }
 
@@ -112,7 +120,7 @@ jint Java_org_vinuxproject_sonic_SonicAudio_getSpeed(
     JNIEnv *env,
     jobject thiz)
 {
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading speed");
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading speed");
     return sonicGetSpeed(stream);
 }
 
@@ -122,7 +130,7 @@ void Java_org_vinuxproject_sonic_SonicAudio_setSpeed(
     jobject thiz,
     jfloat newSpeed)
 {
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Set speed to %f", newSpeed);
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Set speed to %f", newSpeed);
     sonicSetSpeed(stream, newSpeed);
 }
 
@@ -131,7 +139,7 @@ jboolean Java_org_vinuxproject_sonic_SonicAudio_getChordPitch(
     JNIEnv *env,
     jobject thiz)
 {
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading chord pitch");
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading chord pitch");
     return sonicGetChordPitch(stream);
 }
 
@@ -141,7 +149,7 @@ void Java_org_vinuxproject_sonic_SonicAudio_setChordPitch(
     jobject thiz,
     jboolean useChordPitch)
 {
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Set chord pitch to %d", useChordPitch);
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Set chord pitch to %d", useChordPitch);
     sonicSetChordPitch(stream, useChordPitch);
 }
 
@@ -151,7 +159,7 @@ jint Java_org_vinuxproject_sonic_SonicAudio_availableBytes(
     JNIEnv *env,
     jobject thiz)
 {
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading samples available");
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading samples available");
 
     return sonicSamplesAvailable(stream)*sizeof(short)*sonicGetNumChannels(stream);
 }
@@ -161,7 +169,7 @@ void Java_org_vinuxproject_sonic_SonicAudio_flush(
     JNIEnv *env,
     jobject thiz)
 {
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Flushing stream");
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Flushing stream");
     sonicFlushStream(stream);
 }
 
@@ -171,13 +179,13 @@ void Java_org_vinuxproject_sonic_SonicAudio_close(
     jobject thiz)
 {
     if(stream != 0) {
-        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Destroying stream");
+        //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Destroying stream");
         sonicDestroyStream(stream);
-        free(outBuf);
-        outBuf = 0;
-        outBufSize = 0;
+        free(byteBuf);
+        byteBuf = 0;
+        byteBufSize = 0;
     } else {
-        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Stream already destroyed");
+        //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Stream already destroyed");
     }
     stream = 0;
 }
