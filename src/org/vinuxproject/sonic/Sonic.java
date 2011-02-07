@@ -1,66 +1,45 @@
 // This file was written by me, Bill Cox in 2011.
 // I place this file into the public domain.  Feel free to copy from it.
-// Note, however that libsonic, which this application links to,
+// Note, however that libsonic.so, which this application links to,
 // is licensed under LGPL.  You can link to it in your commercial application,
 // but any changes you make to sonic.c or sonic.h need to be shared under
 // the LGPL license.
 
 package org.vinuxproject.sonic;
 
-import java.io.IOException;
-import java.io.InputStream;
-import android.app.Activity;
-import android.os.Bundle;
-
-public class Sonic extends Activity
-{	    
-    @Override
-    public void onCreate(Bundle savedInstanceState) 
+public class Sonic
+{
+    // Called when the activity is first created.
+    public Sonic(int sampleRate, int numChannels)
     {
-        super.onCreate(savedInstanceState);                      
- 
-        new Thread( new Runnable() 
-        {
-            public void run()
-            {        		
-                AndroidAudioDevice device = new AndroidAudioDevice(22050, 1);
-                SonicAudio sonic = new SonicAudio(22050, 1);
-                float speed = 2.0f; // The amount for sonic to speed up audio
-                byte samples[] = new byte[2048];
-                byte modifiedSamples[] = new byte[2048];
-                InputStream soundFile = getResources().openRawResource(R.raw.talking);
-				int bytesRead;
+        init(sampleRate, numChannels);
+    }
 
-				if(soundFile != null) {
-				    sonic.setSpeed(speed);
-				    do {
-				        try {
-							bytesRead = soundFile.read(samples, 0, samples.length);
-							if((bytesRead & 1) != 0) {
-							    finish();
-							}
-						} catch (IOException e) {
-							e.printStackTrace();
-							return;
-						}
-				        if(bytesRead > 0) {
-				        	sonic.putBytes(samples, bytesRead);
-				        } else {
-						    sonic.flush();
-				        }
-			        	int available = sonic.availableBytes(); 
-			        	if(available > 0) {
-			        		if(modifiedSamples.length < available) {
-			        		    modifiedSamples = new byte[available*2];
-			        		}
-			        		sonic.receiveBytes(modifiedSamples, available);
-			        		device.writeSamples(modifiedSamples, available);
-			        	}
-				    } while(bytesRead > 0);
-				    device.flush();
-				    finish();
-				}
-            }
-        } ).start();
+    // Just insure that close gets called, in case the user forgot.
+    protected void finalize()
+    {
+    	// It is safe to call this twice, in case the user already did.
+        close();
+    }
+    
+    // Since this is called in the constructor, you probably don't need to call init.
+    public native void init(int sampleRate, int channels);
+    // When done with sound processing, it's best to call this method to clean up memory.
+    public native void close();
+    public native void flush();
+    public native void setPitch(float newPitch);
+    public native float getPitch();
+    public native void setSpeed(float newSpeed);
+    public native float getSpeed();
+    public native void setRate(float newRate);
+    public native float getRate();
+    public native void setChordPitch(boolean useChordPitch);
+    public native boolean getChordPitch();
+    public native void putBytes(byte[] buffer, int lenBytes);
+    public native int receiveBytes(byte[] ret, int lenBytes);
+    public native int availableBytes();
+
+    static {
+        System.loadLibrary("sonic");
     }
 }

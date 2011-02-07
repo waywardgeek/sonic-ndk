@@ -12,7 +12,7 @@ static short *byteBuf;
 static int byteBufSize;
 
 /* Initialize the C data structure */
-void Java_org_vinuxproject_sonic_SonicAudio_init(
+void Java_org_vinuxproject_sonic_Sonic_init(
     JNIEnv *env,
     jobject thiz,
     jint sampleRate,
@@ -28,7 +28,7 @@ void Java_org_vinuxproject_sonic_SonicAudio_init(
    lenBytes bytes will be read from buffer into the sound alteration object
    buffer is not guaranteed not to change after this function is called,
    so data should be copied from it */
-void Java_org_vinuxproject_sonic_SonicAudio_putBytes(
+void Java_org_vinuxproject_sonic_Sonic_putBytes(
     JNIEnv *env,
     jobject thiz,
     jbyteArray buffer,
@@ -50,7 +50,7 @@ void Java_org_vinuxproject_sonic_SonicAudio_putBytes(
 // Get bytes representing sped up/slowed down sound and put up to lenBytes
 // into ret.
 // Returns number of bytes read.
-jint Java_org_vinuxproject_sonic_SonicAudio_receiveBytes(
+jint Java_org_vinuxproject_sonic_Sonic_receiveBytes(
     JNIEnv *env,
     jobject thiz,
     jbyteArray ret,
@@ -77,7 +77,7 @@ jint Java_org_vinuxproject_sonic_SonicAudio_receiveBytes(
 }
 
 // Set pitch in sound alteration object
-void Java_org_vinuxproject_sonic_SonicAudio_setPitch(
+void Java_org_vinuxproject_sonic_Sonic_setPitch(
     JNIEnv *env,
     jobject thiz,
     jfloat newPitch)
@@ -87,7 +87,7 @@ void Java_org_vinuxproject_sonic_SonicAudio_setPitch(
 }
 
 // Get the current pitch.
-jfloat Java_org_vinuxproject_sonic_SonicAudio_getPitch(
+jfloat Java_org_vinuxproject_sonic_Sonic_getPitch(
     JNIEnv *env,
     jobject thiz)
 {
@@ -97,7 +97,7 @@ jfloat Java_org_vinuxproject_sonic_SonicAudio_getPitch(
 
 // Speed up the sound and increase the pitch, or slow down the sound and
 // decrease the pitch.
-void Java_org_vinuxproject_sonic_SonicAudio_setRate(
+void Java_org_vinuxproject_sonic_Sonic_setRate(
     JNIEnv *env,
     jobject thiz,
     jfloat newRate)
@@ -107,7 +107,7 @@ void Java_org_vinuxproject_sonic_SonicAudio_setRate(
 }
 
 // Return the current playback rate.
-jfloat Java_org_vinuxproject_sonic_SonicAudio_getRate(
+jfloat Java_org_vinuxproject_sonic_Sonic_getRate(
     JNIEnv *env,
     jobject thiz)
 {
@@ -116,7 +116,7 @@ jfloat Java_org_vinuxproject_sonic_SonicAudio_getRate(
 }
 
 // Get the current speed.
-jint Java_org_vinuxproject_sonic_SonicAudio_getSpeed(
+jint Java_org_vinuxproject_sonic_Sonic_getSpeed(
     JNIEnv *env,
     jobject thiz)
 {
@@ -125,7 +125,7 @@ jint Java_org_vinuxproject_sonic_SonicAudio_getSpeed(
 }
 
 // Change the speed.
-void Java_org_vinuxproject_sonic_SonicAudio_setSpeed(
+void Java_org_vinuxproject_sonic_Sonic_setSpeed(
     JNIEnv *env,
     jobject thiz,
     jfloat newSpeed)
@@ -135,7 +135,7 @@ void Java_org_vinuxproject_sonic_SonicAudio_setSpeed(
 }
 
 // Get the current chord pitch setting.
-jboolean Java_org_vinuxproject_sonic_SonicAudio_getChordPitch(
+jboolean Java_org_vinuxproject_sonic_Sonic_getChordPitch(
     JNIEnv *env,
     jobject thiz)
 {
@@ -144,7 +144,7 @@ jboolean Java_org_vinuxproject_sonic_SonicAudio_getChordPitch(
 }
 
 // Set chord pitch mode on or off.  Default is off.
-void Java_org_vinuxproject_sonic_SonicAudio_setChordPitch(
+void Java_org_vinuxproject_sonic_Sonic_setChordPitch(
     JNIEnv *env,
     jobject thiz,
     jboolean useChordPitch)
@@ -155,7 +155,7 @@ void Java_org_vinuxproject_sonic_SonicAudio_setChordPitch(
 
 // Returns the number of bytes that can be read from the speed alteration
 // object
-jint Java_org_vinuxproject_sonic_SonicAudio_availableBytes(
+jint Java_org_vinuxproject_sonic_Sonic_availableBytes(
     JNIEnv *env,
     jobject thiz)
 {
@@ -165,7 +165,7 @@ jint Java_org_vinuxproject_sonic_SonicAudio_availableBytes(
 }
 
 // Process any samples still in a sonic buffer.
-void Java_org_vinuxproject_sonic_SonicAudio_flush(
+void Java_org_vinuxproject_sonic_Sonic_flush(
     JNIEnv *env,
     jobject thiz)
 {
@@ -174,7 +174,7 @@ void Java_org_vinuxproject_sonic_SonicAudio_flush(
 }
 
 // Teardown the C data structure.
-void Java_org_vinuxproject_sonic_SonicAudio_close(
+void Java_org_vinuxproject_sonic_Sonic_close(
     JNIEnv *env,
     jobject thiz)
 {
