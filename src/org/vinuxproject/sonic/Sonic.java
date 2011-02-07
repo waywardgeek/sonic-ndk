@@ -12,9 +12,9 @@ public class Sonic extends Activity
     {
         super.onCreate(savedInstanceState);                      
  
-        new Thread( new Runnable( ) 
+        new Thread( new Runnable() 
         {
-            public void run( )
+            public void run()
             {        		
                 AndroidAudioDevice device = new AndroidAudioDevice(22050, 1);
                 SonicAudio sonic = new SonicAudio(22050, 1);

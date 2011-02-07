@@ -11,9 +11,8 @@ public class SonicAudio
     // Just insure that close gets called, in case the user forgot.
     protected void finalize()
     {
-        if(ptr != 0) {
-            close();
-        }
+    	// It is safe to call this twice, in case the user already did.
+        close();
     }
     
     // Since this is called in the constructor, you probably don't need to call init.
@@ -32,10 +31,6 @@ public class SonicAudio
     public native void putBytes(byte[] buffer, int lenBytes);
     public native int receiveBytes(byte[] ret, int lenBytes);
     public native int availableBytes();
-
-    // Public so it wont get optimized away
-// TODO: replace this with cleaner version
-    public int ptr;
 
     static {
         System.loadLibrary("sonic");

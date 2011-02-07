@@ -8,7 +8,7 @@ public class AndroidAudioDevice
 {
     AudioTrack track;
     byte[] buffer = new byte[2048];
- 
+
     private int findFormatFromChannels(int numChannels)
     {
     	switch(numChannels) {
@@ -17,7 +17,7 @@ public class AndroidAudioDevice
     	default: return -1; // Error
     	}
     }
-    
+   
     public AndroidAudioDevice(int sampleRate, int numChannels)
     {
     	int format = findFormatFromChannels(numChannels);
@@ -27,22 +27,23 @@ public class AndroidAudioDevice
             minSize, AudioTrack.MODE_STREAM);
         track.play();        
     }	   
- 
+
     public void flush()
     {
         track.flush();
     }
-    
+
     public void writeSamples(byte[] samples, int length) 
-    {	
+    {
         fillBuffer( samples );
         track.write( buffer, 0, length);
     }
- 
+
     private void fillBuffer(byte[] samples)
     {
-        if(buffer.length < samples.length)
+        if(buffer.length < samples.length) {
             buffer = new byte[samples.length];
+        }
         System.arraycopy(samples, 0, buffer, 0, samples.length);
     }		
 }
