@@ -11,3 +11,19 @@ are licensed under GNU Lesser General Public License version 2.1. You can freely
 use this NDK application with your commercial application, but if you make
 changes to sonic.c or sonic.h, those changes must be shared as described in the
 file COPYING.
+
+Installing into your Android app
+--------------------------------
+
+Unfortunately, Android makes sharing code very hard.  The simplest way to use
+Sonic in your app is to import the Sonic class into your Eclipse project, and to
+import the sonic-ndk/libs directory into your apps libs directory.  To import
+the Sonic class, use Import->File System, set "From directory: to
+sonic-ndk/src", and "Into folder" to your src direcory.  After you've imported
+the sonic source, delete the two uneeded files from your project, which are:
+
+src/org/vinuxproject/SonicTest.java
+src/org/vinuxproject/AndroidAudioDevice.java
+
+If you don't have a libs directory in your project yet, create it using Eclipse.
+Then, import the libs directory from sonic-ndk into your libs directory.
