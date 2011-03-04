@@ -13,7 +13,7 @@ import android.app.Activity;
 import android.os.Bundle;
 
 public class SonicTest extends Activity
-{	    
+{
     @Override
     public void onCreate(Bundle savedInstanceState) 
     {
@@ -26,7 +26,7 @@ public class SonicTest extends Activity
                 AndroidAudioDevice device = new AndroidAudioDevice(22050, 1);
                 Sonic sonic = new Sonic(22050, 1);
                 float speed = 2.0f; // The amount for sonic to speed up audio
-                byte samples[] = new byte[2048];
+                byte samples[] = new byte[4096];
                 byte modifiedSamples[] = new byte[2048];
                 InputStream soundFile = getResources().openRawResource(R.raw.talking);
 				int bytesRead;

@@ -12,7 +12,6 @@ import android.media.AudioTrack;
 public class AndroidAudioDevice
 {
     AudioTrack track;
-    byte[] buffer = new byte[2048];
 
     private int findFormatFromChannels(int numChannels)
     {
@@ -26,10 +25,10 @@ public class AndroidAudioDevice
     public AndroidAudioDevice(int sampleRate, int numChannels)
     {
     	int format = findFormatFromChannels(numChannels);
-    	int minSize =AudioTrack.getMinBufferSize(sampleRate, format, AudioFormat.ENCODING_PCM_16BIT);        
+    	int minSize = AudioTrack.getMinBufferSize(sampleRate, format, AudioFormat.ENCODING_PCM_16BIT);        
         track = new AudioTrack( AudioManager.STREAM_MUSIC, sampleRate, 
             format, AudioFormat.ENCODING_PCM_16BIT, 
-            minSize, AudioTrack.MODE_STREAM);
+            minSize*4, AudioTrack.MODE_STREAM);
         track.play();        
     }	   
 
@@ -40,15 +39,7 @@ public class AndroidAudioDevice
 
     public void writeSamples(byte[] samples, int length) 
     {
-        fillBuffer( samples );
-        track.write( buffer, 0, length);
+        track.write( samples, 0, length);
     }
 
-    private void fillBuffer(byte[] samples)
-    {
-        if(buffer.length < samples.length) {
-            buffer = new byte[samples.length];
-        }
-        System.arraycopy(samples, 0, buffer, 0, samples.length);
-    }		
 }
