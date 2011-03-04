@@ -115,6 +115,44 @@ jfloat Java_org_vinuxproject_sonic_Sonic_getRate(
     return sonicGetRate(stream);
 }
 
+// Get the current sample rate.
+jint Java_org_vinuxproject_sonic_Sonic_getSampleRate(
+    JNIEnv *env,
+    jobject thiz)
+{
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading sample rate");
+    return sonicGetSampleRate(stream);
+}
+
+// Set the sample rate.
+void Java_org_vinuxproject_sonic_Sonic_setSampleRate(
+    JNIEnv *env,
+    jobject thiz,
+    jint newSampleRate)
+{
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Set sample rate to %d", newSampleRate);
+    sonicSetSampleRate(stream, newSampleRate);
+}
+
+// Get the current number of channels.
+jint Java_org_vinuxproject_sonic_Sonic_getNumChannels(
+    JNIEnv *env,
+    jobject thiz)
+{
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Reading num channels");
+    return sonicGetNumChannels(stream);
+}
+
+// Set the number of channels.
+void Java_org_vinuxproject_sonic_Sonic_setNumChannels(
+    JNIEnv *env,
+    jobject thiz,
+    jint newNumChannels)
+{
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Set sample rate to %d", newNumChannels);
+    sonicSetNumChannels(stream, newNumChannels);
+}
+
 // Get the current speed.
 jint Java_org_vinuxproject_sonic_Sonic_getSpeed(
     JNIEnv *env,

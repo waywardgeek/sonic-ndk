@@ -27,6 +27,11 @@ public class Sonic
     // When done with sound processing, it's best to call this method to clean up memory.
     public native void close();
     public native void flush();
+    // Note that changing the sample rate or num channels will cause a flush.
+    public native void setSampleRate(int newSampleRate);
+    public native int getSampleRate();
+    public native void setNumChannels(int newNumChannels);
+    public native int getNumChannels();
     public native void setPitch(float newPitch);
     public native float getPitch();
     public native void setSpeed(float newSpeed);
