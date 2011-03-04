@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:stretchColumns="1">
+    <TableRow>
+        <TextView
+            android:layout_column="1"
+            android:textSize="32sp"
+            android:text="Speed"
+            android:padding="3dip" />
+		<EditText
+            android:layout_column="2"
+		    android:id="@+id/speed"
+            android:textSize="32sp"
+		    android:inputType="numberDecimal"
+		    android:text="1.0"
+		    />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:layout_column="1"
+            android:textSize="32sp"
+            android:text="Pitch"
+            android:padding="3dip" />
+		<EditText
+		    android:id="@+id/pitch"
+            android:textSize="32sp"
+            android:layout_column="2"
+		    android:inputType="numberDecimal"
+		    android:text="1.0"
+		    />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:layout_column="1"
+            android:textSize="32sp"
+            android:text="Rate"
+            android:padding="3dip" />
+		<EditText
+		    android:id="@+id/rate"
+            android:textSize="32sp"
+            android:layout_column="2"
+		    android:inputType="numberDecimal"
+		    android:text="1.0"
+		    />
+    </TableRow>
+	</TableLayout>
+	<Button android:id="@+id/button"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+           android:textSize="48sp"
+	    android:text="Play"
+	    android:onClick="play" />
+</LinearLayout>
