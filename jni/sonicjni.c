@@ -179,6 +179,25 @@ void Java_org_vinuxproject_sonic_Sonic_setSpeed(
     sonicSetSpeed(stream, newSpeed);
 }
 
+// Get the current volume.
+jint Java_org_vinuxproject_sonic_Sonic_getVolume(
+    JNIEnv *env,
+    jobject thiz)
+{
+    LOGV("Reading volume");
+    return sonicGetVolume(stream);
+}
+
+// Change the volume.
+void Java_org_vinuxproject_sonic_Sonic_setVolume(
+    JNIEnv *env,
+    jobject thiz,
+    jfloat newVolume)
+{
+    LOGV("Set volume to %f", newVolume);
+    sonicSetVolume(stream, newVolume);
+}
+
 // Get the current chord pitch setting.
 jboolean Java_org_vinuxproject_sonic_Sonic_getChordPitch(
     JNIEnv *env,

@@ -43,6 +43,8 @@ public class Sonic
     public native void putBytes(byte[] buffer, int lenBytes);
     public native int receiveBytes(byte[] ret, int lenBytes);
     public native int availableBytes();
+    public native void setVolume(float newVolume);
+    public native float getVolume();
 
     static {
         System.loadLibrary("sonic");
