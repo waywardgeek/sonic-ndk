@@ -161,7 +161,7 @@ void Java_org_vinuxproject_sonic_Sonic_setNumChannels(
 }
 
 // Get the current speed.
-jint Java_org_vinuxproject_sonic_Sonic_getSpeed(
+jfloat Java_org_vinuxproject_sonic_Sonic_getSpeed(
     JNIEnv *env,
     jobject thiz)
 {
@@ -180,7 +180,7 @@ void Java_org_vinuxproject_sonic_Sonic_setSpeed(
 }
 
 // Get the current volume.
-jint Java_org_vinuxproject_sonic_Sonic_getVolume(
+jfloat Java_org_vinuxproject_sonic_Sonic_getVolume(
     JNIEnv *env,
     jobject thiz)
 {
