@@ -54,7 +54,7 @@ void Java_org_vinuxproject_sonic_Sonic_closeNative(
     jobject thiz,
     jlong sonicID)
 {
-    sonicInst inst = (sonicInst)calloc(1, sizeof(struct sonicInstStruct));
+    sonicInst inst = getInst(sonicID);
     sonicStream stream = inst->stream;
 
     LOGV("Destroying stream");
