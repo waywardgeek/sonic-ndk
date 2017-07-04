@@ -3,20 +3,8 @@
    Bill Cox
    This file is part of the Sonic Library.
 
-   The Sonic Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   This file is licensed under the Apache 2.0 license.
+*/
 
 /*
 The Sonic Library implements a new algorithm invented by Bill Cox for the
@@ -39,10 +27,10 @@ generated with:
 
 where t = 0 to newSamples - 1.
 
-For speed factors < 2X, an algorithm similar to PICOLA is used.  The above
+For speed factors < 2X, the PICOLA algorithm is used.  The above
 algorithm is first used to double the speed of one pitch period.  Then, enough
 input is directly copied from the input to the output to achieve the desired
-speed up facter, where 1.0 < speed < 2.0.  The amount of data copied is derived:
+speed up factor, where 1.0 < speed < 2.0.  The amount of data copied is derived:
 
     speed = (2*period + length)/(period + length)
     speed*length + speed*period = 2*period + length
@@ -55,7 +43,7 @@ until the output desired speed is reached.  The length of data copied is:
 
     length = period*(speed - 0.5)/(1 - speed)
 
-For slow down factors between 0.5 and 0.5, no data is copied, and an algorithm
+For slow down factors below 0.5, no data is copied, and an algorithm
 similar to high speed factors is used.
 */
 
