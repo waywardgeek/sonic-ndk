@@ -3,7 +3,8 @@
    Bill Cox
    This file is part of the Sonic Library.
 
-   This file is licensed under the Apache 2.0 license.
+   This file is licensed under the Apache 2.0 license, and also placed into the public domain.
+   Use it either way, at your option.
 */
 
 /*

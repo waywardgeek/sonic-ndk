@@ -12,6 +12,18 @@ use this NDK application with your commercial application, but if you make
 changes to sonic.c or sonic.h, those changes must be shared as described in the
 file COPYING.
 
+Note: While this code works well, maintaining JNI wrapped C code in your Java
+project will be painful.  There in the main sonic project, there is Sonic.java,
+which is a pure Java port of the sonic algorithm.  The main sonic repo is at:
+
+    https://github.com/waywardgeek/sonic
+
+I recently pulled a patch from the main sonic repo that fixes some bugs in this
+version.  I release all the code in that patch to the public domain as well.
+For users who need an actual license, the main repo is licensed under Apache 2.0.
+If you need some other license, just drop me an email.  My intent is to make
+this algorithm free software to all who want it, for any purpose whatsoever.
+
 Installing into your Android app
 --------------------------------
 
